@@ -77,6 +77,45 @@ func CreateTask() gin.HandlerFunc {
 		})
 	}
 }
+func CompleteTask() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		userId := c.Param("taskId")
+		defer cancel()
+		objId, _ := primitive.ObjectIDFromHex(userId)
+
+		update := bson.M{"completed": true}
+		result, err := taskCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				responses.APIResponse{
+					Status:  http.StatusInternalServerError,
+					Message: "error",
+					Data:    gin.H{"data": err.Error()}})
+			return
+		}
+
+		//get updated user details
+		var updatedTask model.Task
+		if result.MatchedCount == 1 {
+			err := taskCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedTask)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.APIResponse{
+					Status:  http.StatusInternalServerError,
+					Message: "error",
+					Data:    gin.H{"data": err.Error()}})
+				return
+			}
+		}
+
+		c.JSON(http.StatusOK,
+			responses.APIResponse{
+				Status:  http.StatusOK,
+				Message: "success",
+				Data:    gin.H{"data": updatedTask}})
+	}
+}
 
 func DeleteTask() gin.HandlerFunc {
 	return func(c *gin.Context) {
