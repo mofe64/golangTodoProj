@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	options2 "go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
 	"time"
@@ -170,8 +171,9 @@ func GetAllMyTasks() gin.HandlerFunc {
 		log.Println("userId", userId)
 		var tasks []model.Task
 		defer cancel()
-
-		results, err := taskCollection.Find(ctx, bson.M{"creatorid": userId})
+		options := options2.Find()
+		options.SetSort(bson.D{{"date", -1}})
+		results, err := taskCollection.Find(ctx, bson.M{"creatorid": userId}, options)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.APIResponse{
 				Status:  http.StatusInternalServerError,
@@ -217,8 +219,10 @@ func GetMyTaskForToday() gin.HandlerFunc {
 		log.Println("userId", userId)
 		var tasks []model.Task
 		defer cancel()
+		options := options2.Find()
+		options.SetSort(bson.D{{"date", -1}})
 
-		results, err := taskCollection.Find(ctx, bson.M{"creatorid": userId})
+		results, err := taskCollection.Find(ctx, bson.M{"creatorid": userId}, options)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.APIResponse{
 				Status:  http.StatusInternalServerError,
