@@ -80,12 +80,13 @@ func CreateTask() gin.HandlerFunc {
 func CompleteTask() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		userId := c.Param("taskId")
+		taskId := c.Param("taskId")
 		defer cancel()
-		objId, _ := primitive.ObjectIDFromHex(userId)
-
+		objId, _ := primitive.ObjectIDFromHex(taskId)
+		log.Println("task Id", taskId)
+		log.Println("task obj id", objId)
 		update := bson.M{"completed": true}
-		result, err := taskCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
+		result, err := taskCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
@@ -95,11 +96,12 @@ func CompleteTask() gin.HandlerFunc {
 					Data:    gin.H{"data": err.Error()}})
 			return
 		}
-
+		log.Println("complete res", result)
 		//get updated user details
 		var updatedTask model.Task
 		if result.MatchedCount == 1 {
-			err := taskCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedTask)
+			log.Println("match")
+			err := taskCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedTask)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, responses.APIResponse{
 					Status:  http.StatusInternalServerError,
@@ -107,6 +109,13 @@ func CompleteTask() gin.HandlerFunc {
 					Data:    gin.H{"data": err.Error()}})
 				return
 			}
+		} else {
+			c.JSON(http.StatusBadRequest, responses.APIResponse{
+				Status:  http.StatusBadRequest,
+				Message: "error",
+				Data:    gin.H{"data": "No task found with that id"},
+			})
+			return
 		}
 
 		c.JSON(http.StatusOK,
