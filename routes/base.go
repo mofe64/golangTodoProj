@@ -6,5 +6,5 @@ import (
 )
 
 func BaseRoute(router *gin.Engine) {
-	router.POST("/", controller.Ping())
+	router.GET("/", controller.Ping())
 }
