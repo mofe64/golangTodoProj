@@ -7,7 +7,7 @@ import (
 )
 
 func TaskRoute(router *gin.Engine) {
-	taskRoutes := router.Group("/tasks", middleware.CORSMiddleware(), middleware.AuthorizeJWT())
+	taskRoutes := router.Group("/tasks", middleware.AuthorizeJWT())
 	{
 		taskRoutes.POST("/", controller.CreateTask())
 		taskRoutes.GET("/user/:userId", controller.GetAllMyTasks())

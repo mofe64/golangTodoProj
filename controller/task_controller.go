@@ -58,7 +58,7 @@ func CreateTask() gin.HandlerFunc {
 			CreatorId:   task.CreatorId,
 			Description: task.Description,
 			Completed:   false,
-			Date:        TimeIn("Nigeria").Add(24 * time.Hour),
+			Date:        TimeIn("Nigeria"),
 		}
 
 		result, err := taskCollection.InsertOne(ctx, newTask)
@@ -135,6 +135,7 @@ func GetAllMyTasks() gin.HandlerFunc {
 		for results.Next(ctx) {
 			log.Println("running in stream")
 			var task model.Task
+			log.Println("task", task)
 			if err = results.Decode(&task); err != nil {
 				c.JSON(http.StatusInternalServerError,
 					responses.APIResponse{
@@ -142,15 +143,22 @@ func GetAllMyTasks() gin.HandlerFunc {
 						Message: "error",
 						Data:    gin.H{"data": err.Error()}})
 			}
+
 			tasks = append(tasks, task)
+
 		}
 
 		c.JSON(http.StatusOK,
 			responses.APIResponse{
 				Status:  http.StatusOK,
 				Message: "success",
-				Data:    gin.H{"data": tasks}},
+				Data: gin.H{
+					"taskCount": len(tasks),
+					"data":      tasks,
+				},
+			},
 		)
+
 	}
 }
 
@@ -174,6 +182,7 @@ func GetMyTaskForToday() gin.HandlerFunc {
 		for results.Next(ctx) {
 			log.Println("running in stream")
 			var task model.Task
+			log.Println("task", task)
 			if err = results.Decode(&task); err != nil {
 				c.JSON(http.StatusInternalServerError,
 					responses.APIResponse{
