@@ -10,7 +10,7 @@ import (
 func main() {
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowAllOrigins = true
+	//corsConfig.AllowAllOrigins = true
 	corsConfig.AllowOrigins = []string{"http://localhost:3000", "https://accountabilityproject.herokuapp.com/"}
 	corsConfig.AllowCredentials = true
 	corsConfig.AllowHeaders = []string{"X-Requested-With",
