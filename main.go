@@ -2,29 +2,29 @@ package main
 
 import (
 	"accountability_back/config"
+	"accountability_back/middleware"
 	"accountability_back/routes"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	router := gin.Default()
-	corsConfig := cors.DefaultConfig()
+	//corsConfig := cors.DefaultConfig()
 	//corsConfig.AllowAllOrigins = true
-	corsConfig.AllowOrigins = []string{"http://localhost:3000", "https://accountabilityproject.herokuapp.com"}
-	corsConfig.AllowCredentials = true
-	corsConfig.AllowHeaders = []string{"X-Requested-With",
-		"Content-Type",
-		"Authorization",
-		"Origin",
-		"Accept",
-		"Access-Control-Request-Method",
-		"Access-Control-Request-Headers",
-	}
-	corsConfig.AllowMethods = []string{"POST", "GET", "PUT", "PATCH", "OPTIONS", "DELETE"}
-	router.Use(cors.New(corsConfig))
+	//corsConfig.AllowOrigins = []string{"http://localhost:3000", "https://accountabilityproject.herokuapp.com"}
+	//corsConfig.AllowCredentials = true
+	//corsConfig.AllowHeaders = []string{"X-Requested-With",
+	//	"Content-Type",
+	//	"Authorization",
+	//	"Origin",
+	//	"Accept",
+	//	"Access-Control-Request-Method",
+	//	"Access-Control-Request-Headers",
+	//}
+	//corsConfig.AllowMethods = []string{"POST", "GET", "PUT", "PATCH", "OPTIONS", "DELETE"}
+	//router.Use(cors.New(corsConfig))
 
-	//router.Use(middleware.CORSMiddleware())
+	router.Use(middleware.CORSMiddleware())
 	//run database
 	config.ConnectDB()
 
