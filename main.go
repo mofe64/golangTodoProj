@@ -13,6 +13,7 @@ func main() {
 	config.ConnectDB()
 
 	//setup routes
+	routes.BaseRoute(router)
 	routes.UserRoute(router)
 	routes.TaskRoute(router)
 
